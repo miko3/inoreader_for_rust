@@ -1,0 +1,15 @@
+[package]
+name = "inoreader_house_cleaning"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rand = "0.8"
+reqwest = { version = "0.11", features = ["json"] }
+percent-encoding = "2.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+dotenv = "0.15"
+tokio = { version = "1", features = ["full"] }
