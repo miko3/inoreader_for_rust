@@ -1,9 +1,9 @@
 use percent_encoding::{utf8_percent_encode, AsciiSet, CONTROLS};
-use repository::ConfigRepository;
 use reqwest::Client;
-use service::ResponseParser;
+use services::response_parser_service::ResponseParser;
 
-use crate::{repository, service};
+use crate::services;
+use crate::repositories::articles_json_repository::ArticlesJsonRepository;
 
 const FRAGMENT: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'<').add(b'>').add(b'`');
 
@@ -68,7 +68,7 @@ impl InoreaderClient {
         }
 
         // JSONファイルに保存
-        if let Err(e) = ConfigRepository::save_articles_to_json(&all_articles) {
+        if let Err(e) = ArticlesJsonRepository::save_articles_to_json(&all_articles) {
             eprintln!("Failed to save articles to JSON: {}", e);
         }
 

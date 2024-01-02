@@ -3,12 +3,10 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use rand::distributions::Alphanumeric;
 use rand::Rng;
 
-use crate::domain::{ApiResponse, Config, TokenResponse};
-use crate::repository::ConfigRepository;
+use crate::domain::{Config, TokenResponse};
+use crate::repositories::config_repository::ConfigRepository;
 
 pub struct AuthenticationService;
-
-pub struct ResponseParser;
 
 impl AuthenticationService {
     fn generate_random_state() -> String {
@@ -19,7 +17,7 @@ impl AuthenticationService {
             .collect()
     }
 
-    pub async fn get_access_token(
+    async fn get_access_token(
         client_id: &str,
         client_secret: &str,
         redirect_uri: &str,
@@ -54,15 +52,10 @@ impl AuthenticationService {
         std::io::stdin().read_line(&mut code).unwrap();
         let code: &str = code.trim();
 
-        let token_response =
+        let token_response: TokenResponse =
             Self::get_access_token(&client_id, &client_secret, &redirect_uri, &code).await?;
 
-        let expires_in_seconds = token_response.expires_in;
-        let current_time: SystemTime = SystemTime::now();
-        let since_the_epoch = current_time
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards");
-        let expiry_time = since_the_epoch + Duration::new(expires_in_seconds.into(), 0);
+        let expiry_time = Self::calculate_expiry_time(token_response.expires_in);
 
         // save authorization code and state
         let app_authorization_info = Config {
@@ -70,26 +63,21 @@ impl AuthenticationService {
             state: state.to_string(),
             access_token: token_response.access_token,
             refresh_token: token_response.refresh_token,
-            expires_in: expiry_time.as_secs(),
+            expires_in: expiry_time,
         };
 
-        let _result = ConfigRepository::save_config(&app_authorization_info);
+        let config_repository = ConfigRepository::new(".config");
+        let _result = config_repository.save_config(&app_authorization_info);
 
         Ok(())
     }
-}
 
-impl ResponseParser {
-    pub fn parse_response(
-        json_str: &str,
-    ) -> Result<(Vec<(String, String)>, Option<String>), serde_json::Error> {
-        let response: ApiResponse = serde_json::from_str(json_str)?;
-        let articles: Vec<(String, String)> = response
-            .items
-            .iter()
-            .map(|item| (item.title.clone(), item.canonical[0].href.clone()))
-            .collect();
-
-        Ok((articles, response.continuation))
+    fn calculate_expiry_time(expires_in_seconds: u64) -> u64 {
+        let current_time: SystemTime = SystemTime::now();
+        let since_the_epoch = current_time
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards");
+        let expiry_time = since_the_epoch + Duration::new(expires_in_seconds.into(), 0);
+        expiry_time.as_secs()
     }
 }
