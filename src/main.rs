@@ -2,6 +2,7 @@ mod domain;
 mod infrastructure;
 mod repositories;
 mod services;
+use clap::Parser;
 
 use dotenv::dotenv;
 use infrastructure::InoreaderClient;
@@ -16,17 +17,22 @@ use crate::repositories::config_repository::ConfigRepository;
 
 const CONFIG_FILE_NAME: &str = ".config";
 
+#[derive(Parser)]
+struct Cli {
+    action_type: String,
+}
+
 #[tokio::main]
 async fn main() {
     dotenv().ok();
-    let args: Vec<String> = env::args().collect();
+    let args = Cli::parse();
 
     let client_id = env::var("INOREADER_CLIENT_ID").expect("INOREADER_CLIENT_ID is not set");
     let client_secret =
         env::var("INOREADER_CLIENT_SECRET").expect("INOREADER_CLIENT_SECRET is not set");
 
-    match args.get(1).map(String::as_str) {
-        Some("setup") => {
+    match args.action_type.as_str() {
+        "setup" => {
             if exist_token_file() {
                 eprintln!("Token file already exists.");
                 exit(1);
@@ -39,7 +45,7 @@ async fn main() {
             .await
             .expect("Authentication failed");
         }
-        Some("fetch_stream") => {
+        "fetch_stream" => {
             if !exist_token_file() {
                 eprintln!("Token file not found. Please run 'setup' command first.");
                 exit(1);
