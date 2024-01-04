@@ -84,3 +84,25 @@ impl AuthenticationService {
         expiry_time.as_secs()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_generate_random_state() {
+        let state = AuthenticationService::generate_random_state();
+        assert_eq!(state.len(), 30);
+    }
+
+    #[test]
+    fn test_calculate_expiry_time() {
+        let expiry_time = AuthenticationService::calculate_expiry_time(3600);
+        let current_time: u64 = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards")
+            .as_secs();
+
+        assert_eq!(expiry_time - current_time, 3600);
+    }
+}
