@@ -8,6 +8,9 @@ use crate::repositories::config_repository::ConfigRepository;
 
 pub struct AuthenticationService;
 
+const AUTH_URL : &str = "https://www.inoreader.com/oauth2/auth";
+const TOKEN_URL: &str = "https://www.inoreader.com/oauth2/token";
+
 impl AuthenticationService {
     fn generate_random_state() -> String {
         rand::thread_rng()
@@ -24,7 +27,7 @@ impl AuthenticationService {
         code: &str,
     ) -> Result<TokenResponse, reqwest::Error> {
         let response = reqwest::Client::new()
-            .post("https://www.inoreader.com/oauth2/token")
+            .post(TOKEN_URL)
             .form(&[
                 ("client_id", client_id),
                 ("client_secret", client_secret),
@@ -44,7 +47,7 @@ impl AuthenticationService {
         redirect_uri: &str,
     ) -> Result<(), reqwest::Error> {
         let state: String = Self::generate_random_state();
-        let auth_url: String = format!("https://www.inoreader.com/oauth2/auth?client_id={}&redirect_uri={}&response_type=code&scope=read&state={}", client_id, redirect_uri, state);
+        let auth_url: String = format!("{}?client_id={}&redirect_uri={}&response_type=code&scope=read&state={}", AUTH_URL, client_id, redirect_uri, state);
         println!("Please navigate to: {}", auth_url);
 
         println!("Enter the code from the URL here: ");

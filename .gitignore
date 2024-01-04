@@ -9,4 +9,4 @@ Cargo.lock
 
 .env
 .config
-articles.json
+articles.*

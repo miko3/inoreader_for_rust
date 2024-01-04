@@ -11,6 +11,7 @@ use std::env;
 use std::path::Path;
 use std::process::exit;
 
+use crate::repositories::articles_data_repository::ArticlesDataRepository;
 use crate::repositories::config_repository::ConfigRepository;
 
 const CONFIG_FILE_NAME: &str = ".config";
@@ -57,10 +58,13 @@ async fn main() {
 
             let access_token = config_repository.get_saved_access_token();
             let client = InoreaderClient::new(client_id, client_secret, access_token.to_string());
-            let _result = client
+            let articles_data = client
                 .fetch_stream_contents()
                 .await
                 .expect("Failed to fetch contents");
+
+            ArticlesDataRepository::save_articles_to_csv(&articles_data)
+                .expect("Failed to save articles to csv");
 
             println!("Done!");
         }

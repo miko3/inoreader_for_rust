@@ -1,2 +1,2 @@
-pub mod articles_json_repository;
+pub mod articles_data_repository;
 pub mod config_repository;

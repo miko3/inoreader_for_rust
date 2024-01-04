@@ -3,8 +3,8 @@ use reqwest::Client;
 use services::response_parser_service::ResponseParser;
 
 use crate::services;
-use crate::repositories::articles_json_repository::ArticlesJsonRepository;
 
+const ENDPOINT_URL : &str = "https://www.inoreader.com/reader/api/0";
 const FRAGMENT: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'<').add(b'>').add(b'`');
 
 pub struct InoreaderClient {
@@ -24,7 +24,7 @@ impl InoreaderClient {
         }
     }
 
-    pub async fn fetch_stream_contents(&self) -> Result<(), reqwest::Error> {
+    pub async fn fetch_stream_contents(&self) -> Result<Vec<(String, String)>, reqwest::Error> {
         let input: &str = "user/-/state/com.google/starred";
         let encoded: String = utf8_percent_encode(input, FRAGMENT).to_string();
         let mut continuation: Option<String> = Some(String::new());
@@ -34,8 +34,12 @@ impl InoreaderClient {
 
         while counter < max_iterations && continuation.is_some() {
             let url: String = format!(
-                "https://www.inoreader.com/reader/api/0/stream/contents/{}?AppId={}&AppKey={}&n=100&c={}",
-                encoded, &self.client_id, &self.client_secret, continuation.as_ref().unwrap()
+                "{}/stream/contents/{}?AppId={}&AppKey={}&n=100&c={}",
+                ENDPOINT_URL,
+                encoded,
+                &self.client_id,
+                &self.client_secret,
+                continuation.as_ref().unwrap()
             );
 
             let response: reqwest::Response = self
@@ -65,13 +69,9 @@ impl InoreaderClient {
                 break;
             }
             counter += 1;
+            println!("Fetching page {}...", counter)
         }
 
-        // JSONファイルに保存
-        if let Err(e) = ArticlesJsonRepository::save_articles_to_json(&all_articles) {
-            eprintln!("Failed to save articles to JSON: {}", e);
-        }
-
-        Ok(())
+        Ok(all_articles)
     }
 }
