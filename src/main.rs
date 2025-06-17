@@ -4,7 +4,7 @@ mod repositories;
 mod services;
 use clap::Parser;
 
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use infrastructure::InoreaderClient;
 use services::authentication_service::AuthenticationService;
 use services::token_service::TokenService;

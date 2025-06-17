@@ -4,6 +4,7 @@ use std::io::Write;
 pub struct ArticlesDataRepository;
 
 impl ArticlesDataRepository {
+    #[allow(dead_code)]
     pub fn save_articles_to_json(articles: &Vec<(String, String)>) -> Result<(), std::io::Error> {
         let json = serde_json::to_string(articles)?;
         let mut file = File::create("articles.json")?;

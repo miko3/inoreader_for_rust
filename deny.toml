@@ -1,0 +1,68 @@
+# cargo-deny configuration file
+# See: https://embarkstudios.github.io/cargo-deny/
+
+[graph]
+# The set of targets to consider when building the graph
+targets = [
+    { triple = "x86_64-unknown-linux-gnu" },
+    { triple = "x86_64-apple-darwin" },
+    { triple = "x86_64-pc-windows-msvc" },
+]
+
+[advisories]
+# Configuration for the advisory checking
+vulnerability = "deny"
+unmaintained = "warn"
+yanked = "warn"
+notice = "warn"
+ignore = [
+    # Add advisory IDs to ignore here if needed
+    # "RUSTSEC-0000-0000",
+]
+
+[licenses]
+# Configuration for license checking
+unlicensed = "deny"
+deny = []
+copyleft = "warn"
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Unicode-DFS-2016",
+]
+
+# List of allowed licenses for examples
+[[licenses.exceptions]]
+allow = ["Unicode-DFS-2016"]
+name = "unicode-ident"
+
+[bans]
+# Configuration for dependency banning
+multiple-versions = "warn"
+wildcards = "allow"
+highlight = "all"
+workspace-default-features = "allow"
+external-default-features = "allow"
+
+# Skip certain crates when checking for multiple versions
+skip = [
+    { name = "windows-sys" },
+    { name = "windows_x86_64_msvc" },
+]
+
+# Deny specific crates
+deny = [
+    # Examples of problematic crates to deny
+    { name = "openssl-sys", reason = "Use rustls instead for better security and no C dependencies" },
+]
+
+[sources]
+# Configuration for source code checking
+unknown-registry = "warn"
+unknown-git = "warn"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

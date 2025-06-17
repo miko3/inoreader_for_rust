@@ -92,7 +92,7 @@ mod tests {
             "continuation":"gmMZgKmmqI4U"
         }"#;
 
-        let (articles, continuation) = ResponseParser::parse_response(json_str).unwrap();
+        let (articles, _continuation) = ResponseParser::parse_response(json_str).unwrap();
 
         assert_eq!(articles.len(), 1);
         assert_eq!(

@@ -1,12 +1,30 @@
 
+# Rust
 debug/
 target/
-
 Cargo.lock
-
 **/*.rs.bk
 *.pdb
 
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
 .env
+
+# Configuration files (contains sensitive tokens)
 .config
+
+# Output files
 articles.*
+
+# Logs
+*.log

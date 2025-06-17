@@ -1,0 +1,187 @@
+name: Security Audit
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run security audit daily at 2:00 AM UTC
+    - cron: '0 2 * * *'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Install cargo-audit
+      run: cargo install cargo-audit
+
+    - name: Run security audit
+      run: cargo audit
+
+    - name: Install cargo-deny
+      run: cargo install cargo-deny
+
+    - name: Run cargo-deny check
+      run: cargo deny check
+
+  dependency-check:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Check for outdated dependencies
+      run: |
+        cargo update --dry-run > outdated.txt 2>&1 || true
+        if grep -q "Updating" outdated.txt; then
+          echo "⚠️ Outdated dependencies found:"
+          cat outdated.txt
+          echo "::warning::Some dependencies may be outdated. Consider updating."
+        else
+          echo "✅ All dependencies are up to date"
+        fi
+
+    - name: Check minimum supported Rust version
+      run: |
+        # Extract MSRV from Cargo.toml if specified
+        if grep -q "rust-version" Cargo.toml; then
+          MSRV=$(grep "rust-version" Cargo.toml | cut -d'"' -f2)
+          echo "Minimum Supported Rust Version: $MSRV"
+        fi
+
+  test-and-coverage:
+    name: TDD Tests and Coverage
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Run unit tests
+      run: cargo test --lib
+
+    - name: Run integration tests
+      run: cargo test --test '*'
+
+    - name: Install cargo-tarpaulin
+      run: cargo install cargo-tarpaulin
+
+    - name: Generate test coverage
+      run: cargo tarpaulin --out xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./cobertura.xml
+        fail_ci_if_error: false
+
+    - name: Check coverage threshold
+      run: |
+        COVERAGE=$(cargo tarpaulin --print-summary | grep -oP 'Coverage: \K[0-9.]+')
+        echo "Coverage: $COVERAGE%"
+        if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+          echo "❌ Coverage $COVERAGE% is below 80% threshold"
+          exit 1
+        else
+          echo "✅ Coverage $COVERAGE% meets the threshold"
+        fi
+
+  lint-and-format:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt, clippy
+
+    - name: Check formatting
+      run: cargo fmt --all -- --check
+
+    - name: Run Clippy
+      run: cargo clippy --all-targets --all-features -- -D warnings
+
+  tdd-compliance:
+    name: TDD Compliance Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check for TDD compliance
+      run: |
+        echo "🔍 Checking TDD compliance..."
+        
+        # Check if new .rs files have corresponding tests
+        NEW_FILES=$(git diff --name-only HEAD~1 HEAD | grep '\.rs$' | grep -v test | grep -v '/tests/' || true)
+        
+        if [ -n "$NEW_FILES" ]; then
+          echo "📝 New Rust files detected:"
+          echo "$NEW_FILES"
+          
+          MISSING_TESTS=""
+          for file in $NEW_FILES; do
+            if [ -f "$file" ]; then
+              # Check if file has #[cfg(test)] module or corresponding test file
+              if ! grep -q "#\[cfg(test)\]" "$file" && ! find . -name "*test*" -type f -exec grep -l "$(basename "$file" .rs)" {} \; | head -1 > /dev/null; then
+                MISSING_TESTS="$MISSING_TESTS\n  - $file"
+              fi
+            fi
+          done
+          
+          if [ -n "$MISSING_TESTS" ]; then
+            echo "❌ TDD Violation: Files without tests found:"
+            echo -e "$MISSING_TESTS"
+            echo ""
+            echo "🔧 Please add tests for new functionality according to TDD principles."
+            echo "   See CONTRIBUTING.md for TDD guidelines."
+            exit 1
+          else
+            echo "✅ All new files have corresponding tests"
+          fi
+        else
+          echo "ℹ️ No new Rust files to check"
+        fi

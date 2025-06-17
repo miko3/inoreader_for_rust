@@ -96,6 +96,8 @@ impl ConfigRepository {
     }
 
     pub fn get_saved_authorization_code(&self) -> String {
-        return self.access_token.to_string();
+        // Note: Authorization code is typically used only once during initial setup
+        // This method returns empty string as the code is not stored after token exchange
+        String::new()
     }
 }
