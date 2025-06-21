@@ -1,29 +1,12 @@
-# cargo-deny configuration file for version 2
+# cargo-deny configuration file
 # See: https://embarkstudios.github.io/cargo-deny/
-
-# Opt into new configuration format
-version = 2
-
-[graph]
-# The set of targets to consider when building the graph
-targets = [
-    { triple = "x86_64-unknown-linux-gnu" },
-    { triple = "x86_64-apple-darwin" },
-    { triple = "x86_64-pc-windows-msvc" },
-]
 
 [advisories]
 # Configuration for the advisory checking
-# With version = 2, most defaults are "deny" which is what we want
-yanked = "warn"
-ignore = [
-    # Add advisory IDs to ignore here if needed
-    # "RUSTSEC-0000-0000",
-]
+ignore = []
 
 [licenses]
 # Configuration for license checking
-# With version = 2, unlicensed defaults to "deny"
 allow = [
     "MIT",
     "Apache-2.0",
@@ -34,28 +17,12 @@ allow = [
     "Unicode-DFS-2016",
 ]
 
-# List of allowed licenses for specific crates
-[[licenses.exceptions]]
-allow = ["Unicode-DFS-2016"]
-name = "unicode-ident"
-
 [bans]
 # Configuration for dependency banning
 multiple-versions = "warn"
-wildcards = "allow"
-highlight = "all"
-workspace-default-features = "allow"
-external-default-features = "allow"
-
-# Skip certain crates when checking for multiple versions
-skip = [
-    { name = "windows-sys" },
-    { name = "windows_x86_64_msvc" },
-]
 
 [sources]
 # Configuration for source code checking
 unknown-registry = "warn"
 unknown-git = "warn"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
-allow-git = []
