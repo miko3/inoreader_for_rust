@@ -1,5 +1,5 @@
-use crate::CONFIG_FILE_NAME;
 use crate::domain::Config;
+use crate::CONFIG_FILE_NAME;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, Read, Write};
@@ -71,7 +71,7 @@ impl ConfigRepository {
     }
 
     pub fn get_saved_access_token(&self) -> String {
-        return self.access_token.to_string();
+        self.access_token.to_string()
     }
 
     pub fn is_token_expired(&self) -> bool {
@@ -84,15 +84,15 @@ impl ConfigRepository {
         if current_time_in_seconds > self.expires_in {
             return true;
         }
-        return false;
+        false
     }
 
     pub fn get_saved_refresh_token(&self) -> String {
-        return self.refresh_token.to_string();
+        self.refresh_token.to_string()
     }
 
     pub fn get_saved_state(&self) -> String {
-        return self.state.to_string();
+        self.state.to_string()
     }
 
     pub fn get_saved_authorization_code(&self) -> String {

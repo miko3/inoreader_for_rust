@@ -1,11 +1,11 @@
 use crate::domain::ApiResponse;
 
+type ParseResult = Result<(Vec<(String, String)>, Option<String>), serde_json::Error>;
+
 pub struct ResponseParser;
 
 impl ResponseParser {
-    pub fn parse_response(
-        json_str: &str,
-    ) -> Result<(Vec<(String, String)>, Option<String>), serde_json::Error> {
+    pub fn parse_response(json_str: &str) -> ParseResult {
         let response: ApiResponse = serde_json::from_str(json_str)?;
         let articles: Vec<(String, String)> = response
             .items
@@ -100,5 +100,4 @@ mod tests {
             "Windows and Linux devices are under attack by a new cryptomining worm"
         );
     }
-
 }

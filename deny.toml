@@ -57,7 +57,8 @@ skip = [
 # Deny specific crates
 deny = [
     # Examples of problematic crates to deny
-    { name = "openssl-sys", reason = "Use rustls instead for better security and no C dependencies" },
+    # Commenting out openssl-sys as it's required by native-tls which is used by reqwest
+    # { name = "openssl-sys", reason = "Use rustls instead for better security and no C dependencies" },
 ]
 
 [sources]

@@ -8,7 +8,7 @@ use crate::repositories::config_repository::ConfigRepository;
 
 pub struct AuthenticationService;
 
-const AUTH_URL : &str = "https://www.inoreader.com/oauth2/auth";
+const AUTH_URL: &str = "https://www.inoreader.com/oauth2/auth";
 const TOKEN_URL: &str = "https://www.inoreader.com/oauth2/token";
 
 impl AuthenticationService {
@@ -47,7 +47,10 @@ impl AuthenticationService {
         redirect_uri: &str,
     ) -> Result<(), reqwest::Error> {
         let state: String = Self::generate_random_state();
-        let auth_url: String = format!("{}?client_id={}&redirect_uri={}&response_type=code&scope=read&state={}", AUTH_URL, client_id, redirect_uri, state);
+        let auth_url: String = format!(
+            "{}?client_id={}&redirect_uri={}&response_type=code&scope=read&state={}",
+            AUTH_URL, client_id, redirect_uri, state
+        );
         println!("Please navigate to: {}", auth_url);
 
         println!("Enter the code from the URL here: ");
@@ -56,7 +59,7 @@ impl AuthenticationService {
         let code: &str = code.trim();
 
         let token_response: TokenResponse =
-            Self::get_access_token(&client_id, &client_secret, &redirect_uri, &code).await?;
+            Self::get_access_token(client_id, client_secret, redirect_uri, code).await?;
 
         let expiry_time = Self::calculate_expiry_time(token_response.expires_in);
 
@@ -80,7 +83,7 @@ impl AuthenticationService {
         let since_the_epoch = current_time
             .duration_since(UNIX_EPOCH)
             .expect("Time went backwards");
-        let expiry_time = since_the_epoch + Duration::new(expires_in_seconds.into(), 0);
+        let expiry_time = since_the_epoch + Duration::new(expires_in_seconds, 0);
         expiry_time.as_secs()
     }
 }

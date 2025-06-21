@@ -4,7 +4,7 @@ use services::response_parser_service::ResponseParser;
 
 use crate::services;
 
-const ENDPOINT_URL : &str = "https://www.inoreader.com/reader/api/0";
+const ENDPOINT_URL: &str = "https://www.inoreader.com/reader/api/0";
 const FRAGMENT: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'<').add(b'>').add(b'`');
 
 pub struct InoreaderClient {

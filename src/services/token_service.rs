@@ -18,9 +18,7 @@ impl TokenService {
         }
     }
 
-    async fn refresh_access_token(
-        &self,
-    ) -> Result<TokenResponse, reqwest::Error> {
+    async fn refresh_access_token(&self) -> Result<TokenResponse, reqwest::Error> {
         let response = reqwest::Client::new()
             .post("https://www.inoreader.com/oauth2/token")
             .form(&[
@@ -37,8 +35,7 @@ impl TokenService {
 
     pub async fn refreshing_token(&self) -> Result<(), reqwest::Error> {
         let config_repository = ConfigRepository::new(".config");
-        let token_response = Self::refresh_access_token(&self)
-        .await?;
+        let token_response = self.refresh_access_token().await?;
 
         let expiry_time = Self::calculate_expiry_time(token_response.expires_in);
 
@@ -51,7 +48,9 @@ impl TokenService {
         };
 
         let config_repository = ConfigRepository::new(".config");
-        config_repository.save_config(&config).expect("Failed to save token file");
+        config_repository
+            .save_config(&config)
+            .expect("Failed to save token file");
 
         Ok(())
     }
@@ -61,7 +60,7 @@ impl TokenService {
         let since_the_epoch = current_time
             .duration_since(UNIX_EPOCH)
             .expect("Time went backwards");
-        let expiry_time = since_the_epoch + Duration::new(expires_in_seconds.into(), 0);
+        let expiry_time = since_the_epoch + Duration::new(expires_in_seconds, 0);
         expiry_time.as_secs()
     }
 }

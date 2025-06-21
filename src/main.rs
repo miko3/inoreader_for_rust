@@ -39,11 +39,11 @@ async fn main() {
             }
 
             let redirect_uri =
-            env::var("INOREADER_REDIRECT_URI").expect("INOREADER_REDIRECT_URI is not set");
+                env::var("INOREADER_REDIRECT_URI").expect("INOREADER_REDIRECT_URI is not set");
 
             AuthenticationService::app_authenticate(&client_id, &client_secret, &redirect_uri)
-            .await
-            .expect("Authentication failed");
+                .await
+                .expect("Authentication failed");
         }
         "fetch_stream" => {
             if !exist_token_file() {
@@ -55,8 +55,7 @@ async fn main() {
             let refresh_token = config_repository.get_saved_refresh_token();
 
             if config_repository.is_token_expired() {
-
-                let _authentication_service = TokenService::new(&client_id, &client_secret, &refresh_token)
+                TokenService::new(&client_id, &client_secret, &refresh_token)
                     .refreshing_token()
                     .await
                     .expect("Failed to refresh token");
