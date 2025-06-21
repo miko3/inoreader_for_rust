@@ -95,11 +95,8 @@ jobs:
           target
         key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
 
-    - name: Run unit tests
-      run: cargo test --lib
-
-    - name: Run integration tests
-      run: cargo test --test '*'
+    - name: Run all tests
+      run: cargo test
 
     - name: Install cargo-tarpaulin
       run: cargo install cargo-tarpaulin
