@@ -1,6 +1,9 @@
 # cargo-deny configuration file
 # See: https://embarkstudios.github.io/cargo-deny/
 
+# Opt into new configuration format
+version = 2
+
 [graph]
 # The set of targets to consider when building the graph
 targets = [
@@ -11,10 +14,10 @@ targets = [
 
 [advisories]
 # Configuration for the advisory checking
-vulnerability = "deny"
-unmaintained = "all"
+# With version = 2, vulnerability now defaults to "deny"
+# unmaintained now defaults to "deny" (previously was set to "all" which is non-standard)
+# notice now defaults to "deny"
 yanked = "warn"
-notice = "warn"
 ignore = [
     # Add advisory IDs to ignore here if needed
     # "RUSTSEC-0000-0000",
@@ -22,9 +25,8 @@ ignore = [
 
 [licenses]
 # Configuration for license checking
-unlicensed = "deny"
-deny = []
-copyleft = "warn"
+# With version = 2, unlicensed defaults to "deny"
+# copyleft defaults to "deny" but we want to allow some copyleft licenses
 allow = [
     "MIT",
     "Apache-2.0",
