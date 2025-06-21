@@ -1,4 +1,4 @@
-# cargo-deny configuration file
+# cargo-deny configuration file for version 2
 # See: https://embarkstudios.github.io/cargo-deny/
 
 # Opt into new configuration format
@@ -14,9 +14,7 @@ targets = [
 
 [advisories]
 # Configuration for the advisory checking
-# With version = 2, vulnerability now defaults to "deny"
-# unmaintained now defaults to "deny" (previously was set to "all" which is non-standard)
-# notice now defaults to "deny"
+# With version = 2, most defaults are "deny" which is what we want
 yanked = "warn"
 ignore = [
     # Add advisory IDs to ignore here if needed
@@ -26,7 +24,6 @@ ignore = [
 [licenses]
 # Configuration for license checking
 # With version = 2, unlicensed defaults to "deny"
-# copyleft defaults to "deny" but we want to allow some copyleft licenses
 allow = [
     "MIT",
     "Apache-2.0",
@@ -37,7 +34,7 @@ allow = [
     "Unicode-DFS-2016",
 ]
 
-# List of allowed licenses for examples
+# List of allowed licenses for specific crates
 [[licenses.exceptions]]
 allow = ["Unicode-DFS-2016"]
 name = "unicode-ident"
@@ -54,13 +51,6 @@ external-default-features = "allow"
 skip = [
     { name = "windows-sys" },
     { name = "windows_x86_64_msvc" },
-]
-
-# Deny specific crates
-deny = [
-    # Examples of problematic crates to deny
-    # Commenting out openssl-sys as it's required by native-tls which is used by reqwest
-    # { name = "openssl-sys", reason = "Use rustls instead for better security and no C dependencies" },
 ]
 
 [sources]
