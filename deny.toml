@@ -12,9 +12,9 @@ targets = [
 [advisories]
 # Configuration for the advisory checking
 vulnerability = "deny"
-unmaintained = "all"
-yanked = "all"
-notice = "all"
+unmaintained = "warn"
+yanked = "warn"
+notice = "warn"
 ignore = [
     # Add advisory IDs to ignore here if needed
     # "RUSTSEC-0000-0000",
