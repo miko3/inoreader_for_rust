@@ -106,9 +106,9 @@ jobs:
 
     - name: Check coverage threshold
       run: |
-        # Extract coverage from the XML output and convert to integer
+        # Extract coverage from the XML output and convert to percentage
         COVERAGE_FLOAT=$(grep -oP 'line-rate="\K[0-9.]+' cobertura.xml | head -1)
-        COVERAGE=$(printf "%.0f" $(echo "$COVERAGE_FLOAT * 100" | awk '{print $1 * $2}'))
+        COVERAGE=$(awk "BEGIN {printf \"%.0f\", $COVERAGE_FLOAT * 100}")
         echo "Coverage: $COVERAGE%"
         # Set threshold to 5% (current coverage is ~9%)
         THRESHOLD=5

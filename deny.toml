@@ -12,7 +12,7 @@ targets = [
 [advisories]
 # Configuration for the advisory checking
 vulnerability = "deny"
-unmaintained = "warn"
+unmaintained = "all"
 yanked = "warn"
 notice = "warn"
 ignore = [
