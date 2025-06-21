@@ -112,7 +112,8 @@ jobs:
 
     - name: Check coverage threshold
       run: |
-        COVERAGE=$(cargo tarpaulin --print-summary | grep -oP 'Coverage: \K[0-9.]+')
+        # Extract coverage from the XML output
+        COVERAGE=$(grep -oP 'line-rate="\K[0-9.]+' cobertura.xml | head -1 | awk '{print $1 * 100}')
         echo "Coverage: $COVERAGE%"
         if (( $(echo "$COVERAGE < 80" | bc -l) )); then
           echo "❌ Coverage $COVERAGE% is below 80% threshold"
