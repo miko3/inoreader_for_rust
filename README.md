@@ -1,6 +1,6 @@
 # 📚 Inoreader for Rust
 
-**Inoreader API を使用してスター付き記事を取得・管理する Rust CLI アプリケーション**
+**Inoreader API を使い、スター付き記事を取得して CSV に出力する Rust CLI**
 
 [![Rust](https://img.shields.io/badge/Rust-000000?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -9,14 +9,14 @@
 
 ## 📋 概要
 
-Inoreader for Rust は、[Inoreader](https://www.inoreader.com/) の API を活用して、スター付きの記事を効率的に取得し、CSV形式で出力するコマンドラインツールです。OAuth2認証フローを完全サポートし、トークンの自動リフレッシュ機能も備えています。
+Inoreader のスター付き記事を取得し、CSV にまとめるコマンドラインツールです。OAuth2 認証とトークン自動リフレッシュを備えています。
 
 ### ✨ 主な機能
 
-- 🔐 **OAuth2 認証システム**: 安全な API アクセス
-- 🔄 **自動トークンリフレッシュ**: 長期間の利用に対応
-- ⭐ **スター付き記事取得**: 効率的なページネーション
-- 📊 **CSV 出力**: データ分析・管理に最適
+- 🔐 **OAuth2 認証**: 安全な API アクセス
+- 🔄 **自動トークンリフレッシュ**: 継続利用に対応
+- ⭐ **スター付き記事取得**: ページネーション対応
+- 📊 **CSV 出力**: 後処理しやすい形式
 - 🏗️ **クリーンアーキテクチャ**: 保守性の高い設計
 
 ---
@@ -130,37 +130,23 @@ make install
 make ci
 ```
 
-### 📋 Makeコマンド
+### 📋 よく使う Make コマンド
 
 ```bash
-# 基本コマンド
+# 基本
 make build              # ビルド
 make test               # テスト実行
 make run-setup          # 初回認証
 make run-fetch          # 記事取得
 
-# TDD開発
-make tdd                # TDD監視モード (ファイル変更時自動テスト)
-make test-watch         # テスト監視モード
-make test-unit          # ユニットテストのみ
-make test-integration   # 統合テストのみ
-make test-coverage      # カバレッジレポート生成
-make test-nextest       # 高速テスト実行
-
-# 品質チェック
+# 品質/セキュリティ
 make format             # コードフォーマット
 make lint               # Clippy lint
 make quality            # 全品質チェック
-
-# セキュリティ
 make audit              # 脆弱性監査
-make deps-check         # 依存関係チェック
-make security           # 全セキュリティチェック
+make ci                 # CI 同等の全チェック
 
-# CI/CD
-make ci                 # 全チェック (品質+セキュリティ)
-make pre-commit         # コミット前チェック
-make release-check      # リリース準備チェック
+詳細は `Makefile` を参照してください。
 ```
 
 ### 🧪 テスト実行
@@ -204,7 +190,7 @@ make format-check
 make quality
 ```
 
-#### CI/CD自動化
+#### CI/CD 自動化
 
 - **GitHub Actions**: `.github/workflows/security-audit.yml`
   - 🔒 毎日自動セキュリティ監査
@@ -237,11 +223,6 @@ make quality
 make tdd                 # 監視モードでTDD開発
 make test-coverage       # カバレッジ確認
 ```
-
-**TDD違反時のCI失敗**:
-- ❌ 新機能にテストがない
-- ❌ カバレッジが80%未満
-- ❌ テストが失敗している
 
 ### デバッグ
 
