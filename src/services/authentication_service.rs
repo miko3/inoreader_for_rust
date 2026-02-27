@@ -1,7 +1,7 @@
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use rand::distributions::Alphanumeric;
-use rand::Rng;
+use rand::distr::Alphanumeric;
+use rand::RngExt;
 
 use crate::domain::{Config, TokenResponse};
 use crate::repositories::config_repository::ConfigRepository;
@@ -13,7 +13,7 @@ const TOKEN_URL: &str = "https://www.inoreader.com/oauth2/token";
 
 impl AuthenticationService {
     fn generate_random_state() -> String {
-        rand::thread_rng()
+        rand::rng()
             .sample_iter(&Alphanumeric)
             .take(30)
             .map(char::from)
