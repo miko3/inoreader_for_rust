@@ -1,5 +1,5 @@
-use crate::domain::Config;
 use crate::CONFIG_FILE_NAME;
+use crate::domain::Config;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, Read, Write};
